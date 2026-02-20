@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Web Proxy</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { padding: 12px; width: 300px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 12px 20px; background: #2ea44f; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #viewer { margin-top: 30px; border: 1px solid #ccc; width: 90%; height: 500px; display: none; background: white; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>GitHub Proxy</h1>
+        <p>Enter a URL to view its source (experimental):</p>
+        <input type="text" id="urlInput" placeholder="https://example.com">
+        <button onclick="loadPage()">Go</button>
+    </div>
+
+    <br>
+    <iframe id="viewer"></iframe>
+
+    <script>
+        async function loadPage() {
+            const url = document.getElementById('urlInput').value;
+            const viewer = document.getElementById('viewer');
+            
+            // We use a CORS proxy to fetch the data
+            const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+
+            try {
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                viewer.style.display = 'inline-block';
+                // Inject the content into the iframe
+                const doc = viewer.contentWindow.document;
+                doc.open();
+                doc.write(data.contents);
+                doc.close();
+            } catch (err) {
+                alert("Failed to load page. Try a different URL.");
+            }
+        }
+    </script>
+</body>
+</html>
